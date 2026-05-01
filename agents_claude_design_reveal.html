@@ -675,6 +675,7 @@
       }
 
       .clawd-bubble {
+        display: none;
         max-width: 178px;
         padding: 9px 12px;
         border: 1px solid rgba(22, 21, 18, 0.16);
@@ -752,6 +753,7 @@
       }
 
       .clawd-status {
+        display: none;
         position: absolute;
         right: -2px;
         top: -14px;
@@ -767,6 +769,7 @@
       }
 
       .clawd-help {
+        display: none;
         position: absolute;
         left: 50%;
         top: calc(100% + 8px);
@@ -1462,7 +1465,7 @@ PROJECT_STATE.md / CHECKS.md / DECISIONS.md를 읽고
         localStorage.removeItem(clawdStorageKey);
         clawdLayer.style.setProperty("--clawd-left", "52%");
         clawdLayer.style.setProperty("--clawd-top", "82px");
-        clawdSay(Reveal.getIndices().h || 0, "위치 리셋");
+          setClawdState(Reveal.getIndices().h || 0);
       }
 
       function startClawdDrag(event) {
@@ -1509,7 +1512,6 @@ PROJECT_STATE.md / CHECKS.md / DECISIONS.md를 읽고
         document.body.style.cursor = "";
         clawdDrag = null;
         if (clawdClickSuppressed) {
-          clawdSay(Reveal.getIndices().h || 0, "여기가 좋아");
           window.setTimeout(() => {
             clawdClickSuppressed = false;
           }, 80);
@@ -1533,15 +1535,17 @@ PROJECT_STATE.md / CHECKS.md / DECISIONS.md를 읽고
       clawd.addEventListener("click", (event) => {
         event.preventDefault();
         event.stopPropagation();
-        if (clawdClickSuppressed) return;
-        const index = Math.floor(Math.random() * clawdLines.length);
-        clawdSay(index, clawdLines[index]);
+        if (!clawdClickSuppressed) {
+          clawdLayer.classList.add("hop");
+          window.setTimeout(() => clawdLayer.classList.remove("hop"), 380);
+        }
       });
 
       clawd.addEventListener("dblclick", (event) => {
         event.preventDefault();
         event.stopPropagation();
-        clawdSay(Reveal.getIndices().h || 0, "좋아, 계속 가자");
+        clawdLayer.classList.add("hop");
+        window.setTimeout(() => clawdLayer.classList.remove("hop"), 380);
       });
 
       clawd.addEventListener("contextmenu", (event) => {
