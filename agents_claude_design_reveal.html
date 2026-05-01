@@ -654,8 +654,9 @@
 
       .clawd-layer {
         position: fixed;
-        right: 42%;
-        top: 82px;
+        left: var(--clawd-left, 52%);
+        top: var(--clawd-top, 82px);
+        right: auto;
         bottom: auto;
         z-index: 30;
         display: grid;
@@ -664,6 +665,11 @@
         pointer-events: none;
         transform: translate(var(--clawd-x, 0), var(--clawd-y, 0));
         transition: transform 220ms ease;
+      }
+
+      .clawd-layer.dragging {
+        transition: none;
+        cursor: grabbing;
       }
 
       .clawd-bubble {
@@ -692,10 +698,14 @@
         width: 118px;
         height: 96px;
         pointer-events: auto;
-        cursor: pointer;
+        cursor: grab;
         image-rendering: pixelated;
         transform-origin: 50% 100%;
         animation: clawd-idle 2.8s steps(2, end) infinite;
+      }
+
+      .clawd:active {
+        cursor: grabbing;
       }
 
       .clawd-sprite {
@@ -747,6 +757,31 @@
         font-weight: 950;
         text-align: center;
         box-shadow: 0 8px 18px rgba(22, 21, 18, 0.18);
+      }
+
+      .clawd-help {
+        position: absolute;
+        left: 50%;
+        top: calc(100% + 8px);
+        width: max-content;
+        max-width: 190px;
+        padding: 7px 10px;
+        border: 1px solid rgba(22, 21, 18, 0.14);
+        border-radius: 999px;
+        background: rgba(255, 250, 240, 0.9);
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 900;
+        opacity: 0;
+        pointer-events: none;
+        transform: translateX(-50%) translateY(-4px);
+        transition: opacity 160ms ease, transform 160ms ease;
+      }
+
+      .clawd-layer:hover .clawd-help,
+      .clawd-layer.dragging .clawd-help {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
       }
 
       @keyframes clawd-idle {
@@ -1307,6 +1342,7 @@ PROJECT_STATE.md / CHECKS.md / DECISIONS.md를 읽고
         <img class="clawd-sprite" src="lecture_assets/clawd/clawd-idle.gif" alt="" />
         <div class="clawd-shadow"></div>
       </div>
+      <div class="clawd-help">드래그로 이동 · 더블클릭 반응 · 우클릭 리셋</div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.2.1/dist/reveal.js"></script>
@@ -1362,6 +1398,9 @@ PROJECT_STATE.md / CHECKS.md / DECISIONS.md를 읽고
         { state: "happy", label: "ask", line: "이렇게 시키기", sprite: "clawd-happy.gif" },
         { state: "sleeping", label: "sleep", line: "입구 정리 완료", sprite: "clawd-sleeping.gif" }
       ];
+      const clawdStorageKey = "ai-harness-lecture-clawd-position";
+      let clawdDrag = null;
+      let clawdClickSuppressed = false;
 
       function setClawdState(index) {
         const config = clawdStates[index] || clawdStates[index % clawdStates.length];
@@ -1382,16 +1421,106 @@ PROJECT_STATE.md / CHECKS.md / DECISIONS.md를 읽고
         }, 1600);
       }
 
+      function clampClawd(left, top) {
+        const rect = clawdLayer.getBoundingClientRect();
+        const maxLeft = window.innerWidth - rect.width - 12;
+        const maxTop = window.innerHeight - rect.height - 12;
+        return {
+          left: Math.max(12, Math.min(maxLeft, left)),
+          top: Math.max(12, Math.min(maxTop, top))
+        };
+      }
+
+      function setClawdPosition(left, top, persist = true) {
+        const next = clampClawd(left, top);
+        clawdLayer.style.setProperty("--clawd-left", `${next.left}px`);
+        clawdLayer.style.setProperty("--clawd-top", `${next.top}px`);
+        if (persist) {
+          localStorage.setItem(clawdStorageKey, JSON.stringify(next));
+        }
+      }
+
+      function loadClawdPosition() {
+        try {
+          const saved = JSON.parse(localStorage.getItem(clawdStorageKey) || "null");
+          if (saved && Number.isFinite(saved.left) && Number.isFinite(saved.top)) {
+            setClawdPosition(saved.left, saved.top, false);
+          }
+        } catch {
+          localStorage.removeItem(clawdStorageKey);
+        }
+      }
+
+      function resetClawdPosition() {
+        localStorage.removeItem(clawdStorageKey);
+        clawdLayer.style.setProperty("--clawd-left", "52%");
+        clawdLayer.style.setProperty("--clawd-top", "82px");
+        clawdSay(Reveal.getIndices().h || 0, "위치 리셋");
+      }
+
       window.addEventListener("pointermove", (event) => {
+        if (clawdDrag) {
+          event.preventDefault();
+          const left = event.clientX - clawdDrag.offsetX;
+          const top = event.clientY - clawdDrag.offsetY;
+          setClawdPosition(left, top);
+          return;
+        }
+
         const x = Math.max(-14, Math.min(10, (event.clientX - window.innerWidth / 2) / 90));
         const y = Math.max(-10, Math.min(10, (event.clientY - window.innerHeight / 2) / 110));
         clawdLayer.style.setProperty("--clawd-x", `${x}px`);
         clawdLayer.style.setProperty("--clawd-y", `${y}px`);
       });
 
+      clawd.addEventListener("pointerdown", (event) => {
+        if (event.button !== 0) return;
+        const rect = clawdLayer.getBoundingClientRect();
+        clawdDrag = {
+          pointerId: event.pointerId,
+          offsetX: event.clientX - rect.left,
+          offsetY: event.clientY - rect.top,
+          startX: event.clientX,
+          startY: event.clientY
+        };
+        clawdClickSuppressed = false;
+        clawdLayer.classList.add("dragging");
+        clawd.setPointerCapture(event.pointerId);
+      });
+
+      clawd.addEventListener("pointerup", (event) => {
+        if (!clawdDrag) return;
+        const moved = Math.hypot(event.clientX - clawdDrag.startX, event.clientY - clawdDrag.startY);
+        clawdClickSuppressed = moved > 6;
+        clawdLayer.classList.remove("dragging");
+        clawd.releasePointerCapture(clawdDrag.pointerId);
+        clawdDrag = null;
+        if (clawdClickSuppressed) {
+          clawdSay(Reveal.getIndices().h || 0, "여기가 좋아");
+          window.setTimeout(() => {
+            clawdClickSuppressed = false;
+          }, 80);
+        }
+      });
+
+      clawd.addEventListener("pointercancel", () => {
+        clawdLayer.classList.remove("dragging");
+        clawdDrag = null;
+      });
+
       clawd.addEventListener("click", () => {
+        if (clawdClickSuppressed) return;
         const index = Math.floor(Math.random() * clawdLines.length);
         clawdSay(index, clawdLines[index]);
+      });
+
+      clawd.addEventListener("dblclick", () => {
+        clawdSay(Reveal.getIndices().h || 0, "좋아, 계속 가자");
+      });
+
+      clawd.addEventListener("contextmenu", (event) => {
+        event.preventDefault();
+        resetClawdPosition();
       });
 
       Reveal.on("slidechanged", (event) => {
@@ -1401,6 +1530,7 @@ PROJECT_STATE.md / CHECKS.md / DECISIONS.md를 읽고
       });
 
       setClawdState(Reveal.getIndices().h || 0);
+      loadClawdPosition();
     </script>
   </body>
 </html>
