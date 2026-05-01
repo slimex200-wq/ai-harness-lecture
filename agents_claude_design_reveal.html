@@ -654,8 +654,8 @@
 
       .clawd-layer {
         position: fixed;
-        left: var(--clawd-left, 52%);
-        top: var(--clawd-top, 82px);
+        left: var(--clawd-left, clamp(220px, calc(100vw - 220px), calc(100vw - 132px)));
+        top: var(--clawd-top, 74px);
         right: auto;
         bottom: auto;
         z-index: 30;
@@ -1393,28 +1393,28 @@ PROJECT_STATE.md / CHECKS.md / DECISIONS.md를 읽고
       ];
       const clawdStates = [
         { state: "idle", label: "idle", line: "강의 시작", sprite: "clawd-idle-follow.svg" },
-        { state: "thinking", label: "plan", line: "오늘 흐름 보기", sprite: "clawd-idle-follow.svg" },
-        { state: "thinking", label: "think", line: "문제 정리 중", sprite: "clawd-idle-follow.svg" },
-        { state: "thinking", label: "tools", line: "입구 비교", sprite: "clawd-idle-follow.svg" },
-        { state: "thinking", label: "oss", line: "오픈소스 보기", sprite: "clawd-idle-follow.svg" },
-        { state: "thinking", label: "mcp", line: "Skill/MCP 구분", sprite: "clawd-idle-follow.svg" },
-        { state: "working", label: "omx", line: "런타임 하네스", sprite: "clawd-working-typing.svg" },
-        { state: "thinking", label: "map", line: "MD와 런타임 구분", sprite: "clawd-idle-follow.svg" },
-        { state: "thinking", label: "map", line: "문서 구조 보기", sprite: "clawd-idle-follow.svg" },
-        { state: "working", label: "md", line: "AGENTS 읽는 중", sprite: "clawd-working-typing.svg" },
-        { state: "working", label: "md", line: "CLAUDE 연결 중", sprite: "clawd-working-typing.svg" },
-        { state: "working", label: "design", line: "DESIGN 확인", sprite: "clawd-working-typing.svg" },
-        { state: "thinking", label: "docs", line: "사실 분리", sprite: "clawd-idle-follow.svg" },
-        { state: "thinking", label: "term", line: "용어 번역", sprite: "clawd-idle-follow.svg" },
-        { state: "working", label: "issue", line: "Issue 카드화", sprite: "clawd-working-typing.svg" },
-        { state: "working", label: "pr", line: "PR 검수", sprite: "clawd-working-typing.svg" },
-        { state: "working", label: "make", line: "직접 만들기", sprite: "clawd-working-typing.svg" },
-        { state: "happy", label: "done", line: "산출물 체크", sprite: "clawd-happy.svg" },
-        { state: "happy", label: "sheet", line: "워크시트 완성", sprite: "clawd-happy.svg" },
-        { state: "working", label: "prompt", line: "프롬프트 작성", sprite: "clawd-working-typing.svg" },
-        { state: "working", label: "fix", line: "문서 보완", sprite: "clawd-working-typing.svg" },
-        { state: "happy", label: "ask", line: "이렇게 시키기", sprite: "clawd-happy.svg" },
-        { state: "sleeping", label: "sleep", line: "입구 정리 완료", sprite: "clawd-sleeping.svg" }
+        { state: "idle", label: "plan", line: "오늘 흐름 보기", sprite: "clawd-idle-follow.svg" },
+        { state: "idle", label: "think", line: "문제 정리 중", sprite: "clawd-idle-follow.svg" },
+        { state: "idle", label: "tools", line: "입구 비교", sprite: "clawd-idle-follow.svg" },
+        { state: "idle", label: "oss", line: "오픈소스 보기", sprite: "clawd-idle-follow.svg" },
+        { state: "idle", label: "mcp", line: "Skill/MCP 구분", sprite: "clawd-idle-follow.svg" },
+        { state: "idle", label: "omx", line: "런타임 하네스", sprite: "clawd-idle-follow.svg" },
+        { state: "idle", label: "map", line: "MD와 런타임 구분", sprite: "clawd-idle-follow.svg" },
+        { state: "idle", label: "map", line: "문서 구조 보기", sprite: "clawd-idle-follow.svg" },
+        { state: "idle", label: "md", line: "AGENTS 읽는 중", sprite: "clawd-idle-follow.svg" },
+        { state: "idle", label: "md", line: "CLAUDE 연결 중", sprite: "clawd-idle-follow.svg" },
+        { state: "idle", label: "design", line: "DESIGN 확인", sprite: "clawd-idle-follow.svg" },
+        { state: "idle", label: "docs", line: "사실 분리", sprite: "clawd-idle-follow.svg" },
+        { state: "idle", label: "term", line: "용어 번역", sprite: "clawd-idle-follow.svg" },
+        { state: "idle", label: "issue", line: "Issue 카드화", sprite: "clawd-idle-follow.svg" },
+        { state: "idle", label: "pr", line: "PR 검수", sprite: "clawd-idle-follow.svg" },
+        { state: "idle", label: "make", line: "직접 만들기", sprite: "clawd-idle-follow.svg" },
+        { state: "idle", label: "done", line: "산출물 체크", sprite: "clawd-idle-follow.svg" },
+        { state: "idle", label: "sheet", line: "워크시트 완성", sprite: "clawd-idle-follow.svg" },
+        { state: "idle", label: "prompt", line: "프롬프트 작성", sprite: "clawd-idle-follow.svg" },
+        { state: "idle", label: "fix", line: "문서 보완", sprite: "clawd-idle-follow.svg" },
+        { state: "idle", label: "ask", line: "이렇게 시키기", sprite: "clawd-idle-follow.svg" },
+        { state: "idle", label: "sleep", line: "입구 정리 완료", sprite: "clawd-idle-follow.svg" }
       ];
       const clawdStorageKey = "ai-harness-lecture-clawd-position";
       let clawdDrag = null;
@@ -1486,9 +1486,9 @@ PROJECT_STATE.md / CHECKS.md / DECISIONS.md를 읽고
 
       function resetClawdPosition() {
         localStorage.removeItem(clawdStorageKey);
-        clawdLayer.style.setProperty("--clawd-left", "52%");
-        clawdLayer.style.setProperty("--clawd-top", "82px");
-          setClawdState(Reveal.getIndices().h || 0);
+        clawdLayer.style.setProperty("--clawd-left", "clamp(220px, calc(100vw - 220px), calc(100vw - 132px))");
+        clawdLayer.style.setProperty("--clawd-top", "74px");
+        setClawdState(Reveal.getIndices().h || 0);
       }
 
       function startClawdDrag(event) {
