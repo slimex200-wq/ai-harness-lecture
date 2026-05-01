@@ -729,6 +729,38 @@
         -webkit-user-drag: none;
       }
 
+      .clawd-eyes {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        width: 44px;
+        height: 18px;
+        pointer-events: none;
+        transform: translate(calc(-50% + var(--clawd-eye-x, 0px)), calc(-50% + var(--clawd-eye-y, 0px))) scale(1.55);
+        transform-origin: 50% 50%;
+        opacity: 0.42;
+        mix-blend-mode: multiply;
+      }
+
+      .clawd-eyes::before,
+      .clawd-eyes::after {
+        content: "";
+        position: absolute;
+        top: 6px;
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        background: #0e1111;
+      }
+
+      .clawd-eyes::before {
+        left: 10px;
+      }
+
+      .clawd-eyes::after {
+        right: 10px;
+      }
+
       .clawd-shadow {
         position: absolute;
         left: 34px;
@@ -1350,6 +1382,7 @@ PROJECT_STATE.md / CHECKS.md / DECISIONS.md를 읽고
       <div class="clawd" title="Clawd">
         <div class="clawd-status">idle</div>
         <img class="clawd-sprite" src="lecture_assets/clawd/clawd-idle.gif" alt="" draggable="false" />
+        <div class="clawd-eyes"></div>
         <div class="clawd-shadow"></div>
       </div>
       <div class="clawd-help">드래그로 이동 · 더블클릭 반응 · 우클릭 리셋</div>
@@ -1500,6 +1533,12 @@ PROJECT_STATE.md / CHECKS.md / DECISIONS.md를 읽고
         const y = Math.max(-10, Math.min(10, (event.clientY - window.innerHeight / 2) / 110));
         clawdLayer.style.setProperty("--clawd-x", `${x}px`);
         clawdLayer.style.setProperty("--clawd-y", `${y}px`);
+
+        const rect = clawdLayer.getBoundingClientRect();
+        const eyeX = Math.max(-4, Math.min(4, (event.clientX - (rect.left + rect.width / 2)) / 45));
+        const eyeY = Math.max(-3, Math.min(3, (event.clientY - (rect.top + rect.height / 2)) / 55));
+        clawdLayer.style.setProperty("--clawd-eye-x", `${eyeX}px`);
+        clawdLayer.style.setProperty("--clawd-eye-y", `${eyeY}px`);
       }
 
       function endClawdDrag(event) {
