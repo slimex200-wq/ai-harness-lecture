@@ -713,7 +713,6 @@
         cursor: grabbing;
       }
 
-      .clawd-sprite,
       .clawd-object {
         position: absolute;
         right: 0;
@@ -734,7 +733,6 @@
         border: 0;
       }
 
-      .clawd-sprite.hidden,
       .clawd-object.hidden {
         display: none;
       }
@@ -1359,8 +1357,7 @@ PROJECT_STATE.md / CHECKS.md / DECISIONS.md를 읽고
       <div class="clawd-bubble">하네스 먼저 읽기</div>
       <div class="clawd" title="Clawd">
         <div class="clawd-status">idle</div>
-        <img class="clawd-sprite" src="lecture_assets/clawd/clawd-idle.gif" alt="" draggable="false" />
-        <object class="clawd-object hidden" type="image/svg+xml" data="lecture_assets/clawd/clawd-idle-follow.svg" aria-label="Clawd"></object>
+        <object class="clawd-object" type="image/svg+xml" data="lecture_assets/clawd/clawd-idle-follow.svg" aria-label="Clawd"></object>
         <div class="clawd-shadow"></div>
       </div>
       <div class="clawd-help">드래그로 이동 · 더블클릭 반응 · 우클릭 리셋</div>
@@ -1384,7 +1381,6 @@ PROJECT_STATE.md / CHECKS.md / DECISIONS.md를 읽고
 
       const clawdLayer = document.querySelector(".clawd-layer");
       const clawd = document.querySelector(".clawd");
-      const clawdSprite = document.querySelector(".clawd-sprite");
       const clawdObject = document.querySelector(".clawd-object");
       const bubble = document.querySelector(".clawd-bubble");
       const statusBadge = document.querySelector(".clawd-status");
@@ -1396,29 +1392,29 @@ PROJECT_STATE.md / CHECKS.md / DECISIONS.md를 읽고
         "DESIGN.md 확인"
       ];
       const clawdStates = [
-        { state: "idle", label: "idle", line: "강의 시작", sprite: "clawd-idle-follow.svg", object: true },
-        { state: "thinking", label: "plan", line: "오늘 흐름 보기", sprite: "clawd-thinking.gif" },
-        { state: "thinking", label: "think", line: "문제 정리 중", sprite: "clawd-thinking.gif" },
-        { state: "thinking", label: "tools", line: "입구 비교", sprite: "clawd-thinking.gif" },
-        { state: "thinking", label: "oss", line: "오픈소스 보기", sprite: "clawd-thinking.gif" },
-        { state: "thinking", label: "mcp", line: "Skill/MCP 구분", sprite: "clawd-thinking.gif" },
-        { state: "working", label: "omx", line: "런타임 하네스", sprite: "clawd-typing.gif" },
-        { state: "thinking", label: "map", line: "MD와 런타임 구분", sprite: "clawd-thinking.gif" },
-        { state: "thinking", label: "map", line: "문서 구조 보기", sprite: "clawd-thinking.gif" },
-        { state: "working", label: "md", line: "AGENTS 읽는 중", sprite: "clawd-typing.gif" },
-        { state: "working", label: "md", line: "CLAUDE 연결 중", sprite: "clawd-typing.gif" },
-        { state: "working", label: "design", line: "DESIGN 확인", sprite: "clawd-typing.gif" },
-        { state: "thinking", label: "docs", line: "사실 분리", sprite: "clawd-thinking.gif" },
-        { state: "thinking", label: "term", line: "용어 번역", sprite: "clawd-thinking.gif" },
-        { state: "working", label: "issue", line: "Issue 카드화", sprite: "clawd-typing.gif" },
-        { state: "working", label: "pr", line: "PR 검수", sprite: "clawd-typing.gif" },
-        { state: "working", label: "make", line: "직접 만들기", sprite: "clawd-typing.gif" },
-        { state: "happy", label: "done", line: "산출물 체크", sprite: "clawd-happy.gif" },
-        { state: "happy", label: "sheet", line: "워크시트 완성", sprite: "clawd-happy.gif" },
-        { state: "working", label: "prompt", line: "프롬프트 작성", sprite: "clawd-typing.gif" },
-        { state: "working", label: "fix", line: "문서 보완", sprite: "clawd-typing.gif" },
-        { state: "happy", label: "ask", line: "이렇게 시키기", sprite: "clawd-happy.gif" },
-        { state: "sleeping", label: "sleep", line: "입구 정리 완료", sprite: "clawd-sleeping.gif" }
+        { state: "idle", label: "idle", line: "강의 시작", sprite: "clawd-idle-follow.svg" },
+        { state: "thinking", label: "plan", line: "오늘 흐름 보기", sprite: "clawd-working-thinking.svg" },
+        { state: "thinking", label: "think", line: "문제 정리 중", sprite: "clawd-working-thinking.svg" },
+        { state: "thinking", label: "tools", line: "입구 비교", sprite: "clawd-working-thinking.svg" },
+        { state: "thinking", label: "oss", line: "오픈소스 보기", sprite: "clawd-working-thinking.svg" },
+        { state: "thinking", label: "mcp", line: "Skill/MCP 구분", sprite: "clawd-working-thinking.svg" },
+        { state: "working", label: "omx", line: "런타임 하네스", sprite: "clawd-working-typing.svg" },
+        { state: "thinking", label: "map", line: "MD와 런타임 구분", sprite: "clawd-working-thinking.svg" },
+        { state: "thinking", label: "map", line: "문서 구조 보기", sprite: "clawd-working-thinking.svg" },
+        { state: "working", label: "md", line: "AGENTS 읽는 중", sprite: "clawd-working-typing.svg" },
+        { state: "working", label: "md", line: "CLAUDE 연결 중", sprite: "clawd-working-typing.svg" },
+        { state: "working", label: "design", line: "DESIGN 확인", sprite: "clawd-working-typing.svg" },
+        { state: "thinking", label: "docs", line: "사실 분리", sprite: "clawd-working-thinking.svg" },
+        { state: "thinking", label: "term", line: "용어 번역", sprite: "clawd-working-thinking.svg" },
+        { state: "working", label: "issue", line: "Issue 카드화", sprite: "clawd-working-typing.svg" },
+        { state: "working", label: "pr", line: "PR 검수", sprite: "clawd-working-typing.svg" },
+        { state: "working", label: "make", line: "직접 만들기", sprite: "clawd-working-typing.svg" },
+        { state: "happy", label: "done", line: "산출물 체크", sprite: "clawd-happy.svg" },
+        { state: "happy", label: "sheet", line: "워크시트 완성", sprite: "clawd-happy.svg" },
+        { state: "working", label: "prompt", line: "프롬프트 작성", sprite: "clawd-working-typing.svg" },
+        { state: "working", label: "fix", line: "문서 보완", sprite: "clawd-working-typing.svg" },
+        { state: "happy", label: "ask", line: "이렇게 시키기", sprite: "clawd-happy.svg" },
+        { state: "sleeping", label: "sleep", line: "입구 정리 완료", sprite: "clawd-sleeping.svg" }
       ];
       const clawdStorageKey = "ai-harness-lecture-clawd-position";
       let clawdDrag = null;
@@ -1428,16 +1424,8 @@ PROJECT_STATE.md / CHECKS.md / DECISIONS.md를 읽고
         const config = clawdStates[index] || clawdStates[index % clawdStates.length];
         clawdLayer.dataset.state = config.state;
         statusBadge.textContent = config.label;
-        if (config.object) {
-          clawdSprite.classList.add("hidden");
-          clawdObject.classList.remove("hidden");
-          if (!clawdObject.data.endsWith(config.sprite)) {
-            clawdObject.data = `lecture_assets/clawd/${config.sprite}`;
-          }
-        } else {
-          clawdObject.classList.add("hidden");
-          clawdSprite.classList.remove("hidden");
-          clawdSprite.src = `lecture_assets/clawd/${config.sprite}`;
+        if (!clawdObject.data.endsWith(config.sprite)) {
+          clawdObject.data = `lecture_assets/clawd/${config.sprite}`;
         }
         return config;
       }
