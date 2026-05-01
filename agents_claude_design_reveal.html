@@ -1,0 +1,1406 @@
+﻿<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>AI 작업 하네스: AGENTS / CLAUDE / DESIGN</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.2.1/dist/reveal.css" />
+    <style>
+      @import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css");
+
+      :root {
+        --paper: #f6f1e8;
+        --ink: #161512;
+        --muted: #706b61;
+        --line: rgba(22, 21, 18, 0.16);
+        --panel: rgba(255, 252, 245, 0.78);
+        --panel-strong: #fffaf0;
+        --mint: #22b8a7;
+        --coral: #ff6f61;
+        --cobalt: #2457e6;
+        --lime: #b8e24a;
+        --shadow: 0 24px 70px rgba(42, 34, 23, 0.16);
+        --r-background-color: var(--paper);
+        --r-main-font: "Pretendard", "Malgun Gothic", sans-serif;
+        --r-heading-font: "Pretendard", "Malgun Gothic", sans-serif;
+        --r-main-color: var(--ink);
+        --r-heading-color: var(--ink);
+        --r-heading-letter-spacing: 0;
+        --r-heading-text-transform: none;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        background:
+          radial-gradient(circle at 16% 18%, rgba(34, 184, 167, 0.2), transparent 28%),
+          radial-gradient(circle at 86% 12%, rgba(255, 111, 97, 0.18), transparent 24%),
+          linear-gradient(135deg, rgba(36, 87, 230, 0.055) 0 25%, transparent 25% 100%),
+          var(--paper);
+      }
+
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        background-image:
+          linear-gradient(rgba(22, 21, 18, 0.035) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(22, 21, 18, 0.035) 1px, transparent 1px);
+        background-size: 44px 44px;
+        mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.72), transparent 80%);
+      }
+
+      .reveal {
+        font-family: var(--r-main-font);
+        letter-spacing: 0;
+        word-break: keep-all;
+        overflow-wrap: break-word;
+      }
+
+      .reveal .slides {
+        text-align: left;
+      }
+
+      .reveal section {
+        min-height: 720px;
+        padding: 58px 74px;
+        color: var(--ink);
+      }
+
+      .reveal section::after {
+        content: "AI Harness Lecture";
+        position: absolute;
+        right: 74px;
+        bottom: 36px;
+        color: rgba(22, 21, 18, 0.38);
+        font-size: 14px;
+        font-weight: 800;
+      }
+
+      .reveal h1,
+      .reveal h2,
+      .reveal h3,
+      .reveal p,
+      .reveal li,
+      .reveal div {
+        letter-spacing: 0;
+        word-spacing: 0;
+      }
+
+      .reveal h1,
+      .reveal h2,
+      .reveal h3,
+      .reveal p {
+        margin: 0;
+      }
+
+      .reveal h1 {
+        max-width: 1000px;
+        font-size: 84px;
+        font-weight: 950;
+        line-height: 0.99;
+        text-wrap: balance;
+      }
+
+      .reveal h2 {
+        max-width: 980px;
+        font-size: 60px;
+        font-weight: 950;
+        line-height: 1.04;
+        text-wrap: balance;
+      }
+
+      .reveal h3 {
+        font-size: 25px;
+        font-weight: 900;
+        line-height: 1.16;
+      }
+
+      .reveal p,
+      .reveal li {
+        font-size: 27px;
+        line-height: 1.42;
+      }
+
+      .kicker {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        width: fit-content;
+        margin-bottom: 22px;
+        padding: 8px 12px;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        background: rgba(255, 250, 240, 0.72);
+        color: var(--muted);
+        font-size: 15px;
+        font-weight: 900;
+        line-height: 1;
+      }
+
+      .kicker::before {
+        content: "";
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+        background: var(--coral);
+      }
+
+      .lead {
+        max-width: 820px;
+        margin-top: 24px;
+        color: var(--muted);
+        font-size: 30px;
+        font-weight: 680;
+        line-height: 1.36;
+        text-wrap: balance;
+      }
+
+      .hero {
+        display: grid;
+        grid-template-columns: 1.04fr 0.96fr;
+        gap: 44px;
+        align-items: center;
+      }
+
+      .hero-mark {
+        position: relative;
+        min-height: 430px;
+        border: 1px solid var(--line);
+        border-radius: 26px;
+        background:
+          linear-gradient(135deg, rgba(255, 255, 255, 0.74), rgba(255, 255, 255, 0.28)),
+          repeating-linear-gradient(90deg, transparent 0 64px, rgba(22, 21, 18, 0.045) 64px 65px);
+        box-shadow: var(--shadow);
+        overflow: hidden;
+      }
+
+      .hero-mark::before {
+        content: "";
+        position: absolute;
+        width: 270px;
+        height: 270px;
+        top: 54px;
+        left: 54px;
+        border-radius: 56px;
+        background: var(--cobalt);
+        transform: rotate(-8deg);
+      }
+
+      .hero-mark::after {
+        content: "";
+        position: absolute;
+        width: 232px;
+        height: 232px;
+        right: 68px;
+        bottom: 60px;
+        border-radius: 50%;
+        background: var(--lime);
+        box-shadow: -120px 38px 0 -34px var(--coral), -58px -134px 0 -46px var(--mint);
+      }
+
+      .orbit {
+        position: absolute;
+        inset: 96px 84px 80px 82px;
+        border: 2px solid rgba(22, 21, 18, 0.5);
+        border-radius: 46%;
+        transform: rotate(14deg);
+      }
+
+      .mini-card {
+        position: absolute;
+        z-index: 1;
+        min-width: 166px;
+        padding: 18px 18px 16px;
+        border: 1px solid rgba(22, 21, 18, 0.18);
+        border-radius: 18px;
+        background: rgba(255, 250, 240, 0.9);
+        box-shadow: 0 14px 30px rgba(35, 28, 18, 0.14);
+        font-size: 18px;
+        font-weight: 900;
+      }
+
+      .mini-card small {
+        display: block;
+        margin-top: 8px;
+        color: var(--muted);
+        font-size: 13px;
+        font-weight: 800;
+      }
+
+      .mini-card.a { top: 44px; right: 46px; }
+      .mini-card.b { left: 42px; bottom: 58px; }
+      .mini-card.c { right: 124px; bottom: 150px; }
+
+      .split,
+      .three {
+        display: grid;
+        gap: 22px;
+        align-items: stretch;
+      }
+
+      .split {
+        grid-template-columns: 1fr 1fr;
+        margin-top: 34px;
+      }
+
+      .three {
+        grid-template-columns: repeat(3, 1fr);
+        margin-top: 34px;
+      }
+
+      .tile,
+      .doc-card {
+        position: relative;
+        min-height: 294px;
+        padding: 30px;
+        border: 1px solid var(--line);
+        border-radius: 24px;
+        background: var(--panel);
+        box-shadow: 0 18px 48px rgba(42, 34, 23, 0.1);
+        overflow: hidden;
+      }
+
+      .tile.bad {
+        background: linear-gradient(145deg, rgba(255, 111, 97, 0.22), rgba(255, 250, 240, 0.84));
+      }
+
+      .tile.good {
+        background: linear-gradient(145deg, rgba(34, 184, 167, 0.22), rgba(255, 250, 240, 0.86));
+      }
+
+      .tile h3,
+      .doc-card h3 {
+        margin-bottom: 18px;
+      }
+
+      .tile p,
+      .doc-card p {
+        color: var(--muted);
+        font-size: 24px;
+        font-weight: 680;
+      }
+
+      .doc-card .tag {
+        display: inline-block;
+        margin-bottom: 34px;
+        padding: 7px 10px;
+        border-radius: 999px;
+        background: var(--ink);
+        color: var(--paper);
+        font-size: 14px;
+        font-weight: 900;
+      }
+
+      .doc-card h3 {
+        font-family: "Cascadia Mono", "Consolas", monospace;
+        font-size: 30px;
+      }
+
+      .mac-window {
+        margin-top: 26px;
+        border: 1px solid rgba(22, 21, 18, 0.16);
+        border-radius: 24px;
+        background: rgba(255, 250, 240, 0.92);
+        box-shadow: var(--shadow);
+        overflow: hidden;
+      }
+
+      .mac-bar {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        height: 46px;
+        padding: 0 18px;
+        border-bottom: 1px solid rgba(22, 21, 18, 0.12);
+        background: rgba(255, 255, 255, 0.62);
+      }
+
+      .dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: #ff6f61;
+      }
+
+      .dot:nth-child(2) { background: #f6c85f; }
+      .dot:nth-child(3) { background: #22b8a7; }
+
+      .path {
+        margin-left: 12px;
+        color: var(--muted);
+        font-size: 15px;
+        font-weight: 900;
+      }
+
+      .markdown-view {
+        display: grid;
+        grid-template-columns: 260px 1fr;
+        min-height: 382px;
+      }
+
+      .md-sidebar {
+        padding: 24px;
+        border-right: 1px solid rgba(22, 21, 18, 0.12);
+        background: rgba(22, 21, 18, 0.035);
+      }
+
+      .md-file {
+        margin-bottom: 12px;
+        padding: 12px 14px;
+        border-radius: 13px;
+        color: var(--muted);
+        font-size: 17px;
+        font-weight: 900;
+      }
+
+      .md-file.active {
+        background: var(--ink);
+        color: var(--paper);
+      }
+
+      .md-body {
+        padding: 28px 36px;
+        max-height: 390px;
+        overflow: hidden;
+      }
+
+      .md-body h3 {
+        margin: 0 0 16px;
+        font-size: 34px;
+        line-height: 1.05;
+      }
+
+      .md-body p,
+      .md-body li {
+        color: #3f3b35;
+        font-size: 20px;
+        font-weight: 700;
+        line-height: 1.36;
+      }
+
+      .md-body ul,
+      .md-body ol {
+        margin: 12px 0 0 25px;
+        padding: 0;
+      }
+
+      .md-body code {
+        padding: 2px 6px;
+        border-radius: 7px;
+        background: rgba(22, 21, 18, 0.08);
+        font-family: "Cascadia Mono", "Consolas", monospace;
+        font-size: 0.86em;
+      }
+
+      .md-body pre {
+        margin: 16px 0 0;
+        padding: 16px 20px;
+        border-radius: 18px;
+        background: #171713;
+        color: #fff8ec;
+        font-family: "Cascadia Mono", "Consolas", monospace;
+        font-size: 16px;
+        line-height: 1.34;
+        white-space: pre-wrap;
+      }
+
+      .note {
+        margin-top: 16px;
+        color: var(--muted);
+        font-size: 18px;
+        font-weight: 800;
+      }
+
+      .shot-layout {
+        display: grid;
+        grid-template-columns: 0.78fr 1.22fr;
+        gap: 34px;
+        align-items: center;
+        min-height: 590px;
+      }
+
+      .shot-copy h2 {
+        font-size: 54px;
+      }
+
+      .shot-copy .lead {
+        max-width: 460px;
+        font-size: 26px;
+      }
+
+      .screenshot {
+        position: relative;
+        padding: 14px;
+        border: 1px solid rgba(22, 21, 18, 0.16);
+        border-radius: 26px;
+        background: rgba(255, 250, 240, 0.88);
+        box-shadow: var(--shadow);
+      }
+
+      .screenshot img {
+        display: block;
+        width: 100%;
+        height: 520px;
+        border-radius: 16px;
+        object-fit: cover;
+        object-position: top left;
+      }
+
+      .caption-chip {
+        position: absolute;
+        left: 28px;
+        bottom: 28px;
+        padding: 10px 14px;
+        border-radius: 999px;
+        background: rgba(22, 21, 18, 0.86);
+        color: var(--paper);
+        font-size: 15px;
+        font-weight: 900;
+      }
+
+      .quote {
+        margin-top: 34px;
+        padding: 40px 44px;
+        border-radius: 30px;
+        background: var(--ink);
+        color: var(--paper);
+        box-shadow: var(--shadow);
+      }
+
+      .quote p {
+        font-size: 42px;
+        font-weight: 900;
+        line-height: 1.28;
+        text-wrap: balance;
+      }
+
+      .quote strong {
+        color: var(--lime);
+      }
+
+      .code-prompt {
+        margin-top: 28px;
+        padding: 28px 32px;
+        border-radius: 24px;
+        background: #171713;
+        color: #fff8ec;
+        box-shadow: var(--shadow);
+        font-family: "Cascadia Mono", "Consolas", monospace;
+        font-size: 19px;
+        line-height: 1.48;
+        white-space: pre-wrap;
+      }
+
+      .code-prompt.compact {
+        font-size: 19px;
+        line-height: 1.42;
+      }
+
+      .checklist {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 18px;
+        margin-top: 30px;
+      }
+
+      .check {
+        display: grid;
+        grid-template-columns: 46px 1fr;
+        gap: 16px;
+        align-items: start;
+        min-height: 112px;
+        padding: 22px;
+        border: 1px solid var(--line);
+        border-radius: 22px;
+        background: rgba(255, 250, 240, 0.86);
+        box-shadow: 0 14px 36px rgba(42, 34, 23, 0.09);
+      }
+
+      .check .box {
+        display: grid;
+        place-items: center;
+        width: 42px;
+        height: 42px;
+        border-radius: 13px;
+        background: var(--ink);
+        color: var(--paper);
+        font-size: 19px;
+        font-weight: 950;
+      }
+
+      .check h3 {
+        margin-bottom: 6px;
+        font-size: 23px;
+      }
+
+      .check p {
+        color: var(--muted);
+        font-size: 19px;
+        font-weight: 700;
+        line-height: 1.34;
+      }
+
+      .timeline {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 16px;
+        margin-top: 34px;
+      }
+
+      .time-block {
+        min-height: 330px;
+        padding: 28px 24px;
+        border: 1px solid var(--line);
+        border-radius: 24px;
+        background: rgba(255, 250, 240, 0.86);
+        box-shadow: 0 14px 36px rgba(42, 34, 23, 0.09);
+      }
+
+      .time-block .minute {
+        display: inline-block;
+        margin-bottom: 26px;
+        padding: 7px 10px;
+        border-radius: 999px;
+        background: var(--ink);
+        color: var(--paper);
+        font-size: 14px;
+        font-weight: 950;
+      }
+
+      .time-block h3 {
+        margin-bottom: 14px;
+        font-size: 25px;
+      }
+
+      .time-block p {
+        color: var(--muted);
+        font-size: 20px;
+        font-weight: 700;
+        line-height: 1.34;
+      }
+
+      .glossary {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 18px;
+        margin-top: 30px;
+      }
+
+      .term {
+        min-height: 112px;
+        padding: 22px 24px;
+        border: 1px solid var(--line);
+        border-radius: 22px;
+        background: rgba(255, 250, 240, 0.86);
+        box-shadow: 0 14px 36px rgba(42, 34, 23, 0.09);
+      }
+
+      .term h3 {
+        margin-bottom: 8px;
+        font-size: 24px;
+        font-family: "Cascadia Mono", "Consolas", monospace;
+      }
+
+      .term p {
+        color: var(--muted);
+        font-size: 20px;
+        font-weight: 700;
+        line-height: 1.34;
+      }
+
+      .worksheet {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 18px;
+        margin-top: 30px;
+      }
+
+      .field {
+        min-height: 134px;
+        padding: 22px 24px;
+        border: 1px solid rgba(22, 21, 18, 0.18);
+        border-radius: 22px;
+        background: rgba(255, 250, 240, 0.86);
+        box-shadow: 0 14px 36px rgba(42, 34, 23, 0.09);
+      }
+
+      .field.wide {
+        grid-column: span 2;
+      }
+
+      .field h3 {
+        margin-bottom: 12px;
+        font-size: 23px;
+      }
+
+      .line {
+        height: 18px;
+        margin-top: 10px;
+        border-bottom: 2px solid rgba(22, 21, 18, 0.18);
+      }
+
+      .reveal .controls {
+        color: var(--ink);
+      }
+
+      .reveal .progress {
+        height: 7px;
+        color: var(--coral);
+      }
+
+      .clawd-layer {
+        position: fixed;
+        right: 82px;
+        top: 42px;
+        bottom: auto;
+        z-index: 30;
+        display: grid;
+        gap: 8px;
+        justify-items: center;
+        pointer-events: none;
+        transform: translate(var(--clawd-x, 0), var(--clawd-y, 0));
+        transition: transform 220ms ease;
+      }
+
+      .clawd-bubble {
+        max-width: 178px;
+        padding: 9px 12px;
+        border: 1px solid rgba(22, 21, 18, 0.16);
+        border-radius: 14px;
+        background: rgba(255, 250, 240, 0.92);
+        color: var(--ink);
+        box-shadow: 0 14px 36px rgba(42, 34, 23, 0.12);
+        font-size: 13px;
+        font-weight: 900;
+        line-height: 1.25;
+        opacity: 0;
+        transform: translateY(-8px);
+        transition: opacity 180ms ease, transform 180ms ease;
+      }
+
+      .clawd-layer.talking .clawd-bubble {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .clawd {
+        position: relative;
+        width: 118px;
+        height: 96px;
+        pointer-events: auto;
+        cursor: pointer;
+        image-rendering: pixelated;
+        transform-origin: 50% 100%;
+        animation: clawd-idle 2.8s steps(2, end) infinite;
+      }
+
+      .clawd-sprite {
+        position: absolute;
+        right: 0;
+        bottom: 0;
+        width: 118px;
+        height: 96px;
+        object-fit: contain;
+        image-rendering: pixelated;
+        filter: drop-shadow(0 12px 20px rgba(22, 21, 18, 0.16));
+        transform: scale(1.55);
+        transform-origin: 50% 100%;
+      }
+
+      .clawd-shadow {
+        position: absolute;
+        left: 34px;
+        bottom: 2px;
+        width: 56px;
+        height: 5px;
+        background: rgba(22, 21, 18, 0.46);
+      }
+
+      .clawd-layer.hop .clawd {
+        animation: clawd-hop 360ms ease;
+      }
+
+      .clawd-layer[data-state="working"] .clawd {
+        animation: clawd-work 520ms steps(2, end) infinite;
+      }
+
+      .clawd-layer[data-state="sleeping"] .clawd {
+        animation: none;
+        transform: rotate(0deg) translateY(4px);
+        opacity: 0.72;
+      }
+
+      .clawd-status {
+        position: absolute;
+        right: -2px;
+        top: -14px;
+        min-width: 34px;
+        padding: 4px 7px;
+        border-radius: 999px;
+        background: var(--ink);
+        color: var(--paper);
+        font-size: 11px;
+        font-weight: 950;
+        text-align: center;
+        box-shadow: 0 8px 18px rgba(22, 21, 18, 0.18);
+      }
+
+      @keyframes clawd-idle {
+        0%, 100% { transform: translateY(0) rotate(-1deg); }
+        50% { transform: translateY(-3px) rotate(1deg); }
+      }
+
+      @keyframes clawd-hop {
+        0% { transform: translateY(0) scaleX(1); }
+        45% { transform: translateY(-18px) scaleX(1.05); }
+        100% { transform: translateY(0) scaleX(1); }
+      }
+
+      @keyframes clawd-work {
+        0%, 100% { transform: translateX(-2px) translateY(0); }
+        50% { transform: translateX(2px) translateY(-2px); }
+      }
+
+    </style>
+  </head>
+  <body>
+    <div class="reveal">
+      <div class="slides">
+        <section>
+          <div class="hero">
+            <div>
+              <div class="kicker">AI 작업 하네스</div>
+              <h1>AI도 온보딩이 필요하다</h1>
+              <p class="lead">
+                사람에게 회사 규칙을 알려주듯, AI에게도 프로젝트를 이해하는 입구가 필요하다.
+              </p>
+            </div>
+            <div class="hero-mark" aria-hidden="true">
+              <div class="orbit"></div>
+              <div class="mini-card a">AGENTS<small>공통 출입문</small></div>
+              <div class="mini-card b">CHECKS<small>완료 기준</small></div>
+              <div class="mini-card c">DESIGN<small>취향과 금지선</small></div>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <div class="kicker">오늘 흐름</div>
+          <h2>오늘은 이 순서로 간다</h2>
+          <div class="timeline">
+            <div class="time-block">
+              <span class="minute">0-10분</span>
+              <h3>문제 공감</h3>
+              <p>AI가 매번 다른 답을 하는 이유와 도구별 입구 차이를 설명한다.</p>
+            </div>
+            <div class="time-block">
+              <span class="minute">10-25분</span>
+              <h3>하네스 구조</h3>
+              <p>Skill, MCP, OMC/OMX와 AGENTS, CLAUDE, DESIGN의 역할을 보여준다.</p>
+            </div>
+            <div class="time-block">
+              <span class="minute">25-40분</span>
+              <h3>GitHub 운영</h3>
+              <p>Issue는 작업 카드, PR은 검수 공간이라는 식으로 비개발자 언어로 설명한다.</p>
+            </div>
+            <div class="time-block">
+              <span class="minute">40-60분</span>
+              <h3>실습</h3>
+              <p>각자 프로젝트의 상태, 확인 방법, 금지 결정을 한 장 워크시트에 적는다.</p>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <div class="kicker">문제</div>
+          <h2>채팅창 설명만으로는 프로젝트 기억이 유지되지 않는다</h2>
+          <div class="split">
+            <div class="tile bad">
+              <h3>반복 설명</h3>
+              <p>매번 배경을 다시 말하고, AI가 기억한다고 믿어야 한다.</p>
+            </div>
+            <div class="tile good">
+              <h3>문서로 고정</h3>
+              <p>AI가 먼저 읽는 프로젝트 지도를 만들면 도구가 바뀌어도 기준은 남는다.</p>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <div class="kicker">도구 지형도</div>
+          <h2>AI를 쓰는 입구는 하나가 아니다</h2>
+          <div class="timeline">
+            <div class="time-block">
+              <span class="minute">Web</span>
+              <h3>웹 채팅</h3>
+              <p>빠르게 묻고 답하기 좋지만, 내 프로젝트 파일과 실행 환경은 약하다.</p>
+            </div>
+            <div class="time-block">
+              <span class="minute">App</span>
+              <h3>데스크톱 앱</h3>
+              <p>파일, 브라우저, 터미널을 한곳에서 다루며 작업 흐름을 오래 가져간다.</p>
+            </div>
+            <div class="time-block">
+              <span class="minute">IDE</span>
+              <h3>Cursor / VS Code</h3>
+              <p>코드 편집과 리뷰에 강하고, 개발자 작업 흐름에 가장 가깝다.</p>
+            </div>
+            <div class="time-block">
+              <span class="minute">Terminal</span>
+              <h3>CLI</h3>
+              <p>테스트, 빌드, git, 자동화에 강하다. 대신 맥락 문서가 더 중요하다.</p>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <div class="kicker">오픈소스</div>
+          <h2>오픈소스 도구는 “작업 방식을 빌려올 수 있다”</h2>
+          <div class="split">
+            <div class="tile good">
+              <h3>좋은 점</h3>
+              <p>Clawd 같은 도구의 상태 표시, 훅, 테마 구조를 보고 내 작업 방식에 맞게 응용할 수 있다.</p>
+            </div>
+            <div class="tile">
+              <h3>주의할 점</h3>
+              <p>코드 라이선스와 이미지/캐릭터 라이선스는 다를 수 있다. 쓸 때는 범위를 확인한다.</p>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <div class="kicker">Skill / MCP</div>
+          <h2>Skill은 일하는 법, MCP는 연결하는 법이다</h2>
+          <div class="split">
+            <div class="tile">
+              <h3>Skill</h3>
+              <p>AI에게 특정 작업 방식을 알려주는 절차서다. 예: 코드 리뷰 방법, 발표자료 만드는 방법, 리서치 방식.</p>
+            </div>
+            <div class="tile">
+              <h3>MCP</h3>
+              <p>AI가 외부 도구와 데이터에 접근하게 하는 연결 규격이다. 예: GitHub, Figma, DB, 브라우저.</p>
+            </div>
+          </div>
+          <div class="quote">
+            <p>Skill은 <strong>행동 규칙</strong>, MCP는 <strong>도구 연결</strong>이다.</p>
+          </div>
+        </section>
+
+        <section>
+          <div class="kicker">OMC / OMX</div>
+          <h2>OMC/OMX는 AI 실행을 안정시키는 런타임 하네스다</h2>
+          <div class="three">
+            <div class="doc-card">
+              <span class="tag">상태</span>
+              <h3>Memory</h3>
+              <p>작업 상태, 계획, 로그를 남겨 다음 세션에서도 이어갈 수 있게 한다.</p>
+            </div>
+            <div class="doc-card">
+              <span class="tag">흐름</span>
+              <h3>Modes</h3>
+              <p>plan, team, review, verify 같은 작업 모드를 만들어 AI가 덜 즉흥적으로 움직이게 한다.</p>
+            </div>
+            <div class="doc-card">
+              <span class="tag">검증</span>
+              <h3>Checks</h3>
+              <p>테스트, 빌드, 리뷰, 완료 보고를 반복 가능한 절차로 묶는다.</p>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <div class="kicker">핵심 구분</div>
+          <h2>OMC/OMX가 있어도 프로젝트 MD는 필요하다</h2>
+          <div class="split">
+            <div class="tile">
+              <h3>OMC / OMX</h3>
+              <p>AI가 어떻게 움직일지 정하는 실행 엔진이다. 모드, 훅, 팀, 상태 저장을 담당한다.</p>
+            </div>
+            <div class="tile good">
+              <h3>AGENTS / CLAUDE / DESIGN</h3>
+              <p>이 프로젝트가 무엇인지 알려주는 지도다. 제품 사실, 결정, 검증, 취향을 담당한다.</p>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <div class="kicker">큰 그림</div>
+          <h2>하네스 MD는 AI의 작업 순서를 정해주는 프로젝트 지도다</h2>
+          <div class="three">
+            <div class="doc-card">
+              <span class="tag">입구</span>
+              <h3>AGENTS.md</h3>
+              <p>Codex, Claude, Gemini가 공통으로 읽을 프로젝트 출입문</p>
+            </div>
+            <div class="doc-card">
+              <span class="tag">어댑터</span>
+              <h3>CLAUDE.md</h3>
+              <p>Claude/OMC가 같은 출입문을 따르게 하는 얇은 연결 문서</p>
+            </div>
+            <div class="doc-card">
+              <span class="tag">취향</span>
+              <h3>DESIGN.md</h3>
+              <p>AI가 화면을 만들 때 지켜야 할 제품 톤과 금지 패턴</p>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <div class="kicker">실제 MD 1</div>
+          <h2>AGENTS.md는 모든 AI가 먼저 보는 목차다</h2>
+          <div class="mac-window">
+            <div class="mac-bar">
+              <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+              <div class="path">claude-budget-app / AGENTS.md</div>
+            </div>
+            <div class="markdown-view">
+              <div class="md-sidebar">
+                <div class="md-file active">AGENTS.md</div>
+                <div class="md-file">PROJECT_STATE.md</div>
+                <div class="md-file">CHECKS.md</div>
+                <div class="md-file">DECISIONS.md</div>
+                <div class="md-file">DESIGN.md</div>
+              </div>
+              <div class="md-body">
+                <h3>Shared AI Entry Point</h3>
+                <p>This repo is used by Codex/OMX and Claude/OMC. Follow your local runtime rules first.</p>
+                <p>Before changing files, read:</p>
+                <ol>
+                  <li><code>PROJECT_STATE.md</code> - current status and next work</li>
+                  <li><code>CHECKS.md</code> - verification commands and platform notes</li>
+                  <li><code>DECISIONS.md</code> - product, native, payment, auth, safety decisions</li>
+                  <li><code>GITHUB_WORKFLOW.md</code> - branch, issue, PR, sync rules</li>
+                  <li><code>DESIGN.md</code> - visual and UI source of truth</li>
+                </ol>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <div class="kicker">실제 MD 2</div>
+          <h2>CLAUDE.md는 별도 헌법이 아니라 어댑터다</h2>
+          <div class="mac-window">
+            <div class="mac-bar">
+              <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+              <div class="path">claude-budget-app / CLAUDE.md</div>
+            </div>
+            <div class="markdown-view">
+              <div class="md-sidebar">
+                <div class="md-file">AGENTS.md</div>
+                <div class="md-file active">CLAUDE.md</div>
+                <div class="md-file">PROJECT_STATE.md</div>
+                <div class="md-file">CHECKS.md</div>
+                <div class="md-file">DESIGN.md</div>
+              </div>
+              <div class="md-body">
+                <h3>Claude / OMC Adapter</h3>
+                <p>Follow <code>AGENTS.md</code>.</p>
+                <p>This file is only a Claude/OMC entrypoint. Keep shared project facts in:</p>
+                <ul>
+                  <li><code>PROJECT_STATE.md</code></li>
+                  <li><code>CHECKS.md</code></li>
+                  <li><code>DECISIONS.md</code></li>
+                  <li><code>GITHUB_WORKFLOW.md</code></li>
+                </ul>
+                <p>For visual work, read <code>DESIGN.md</code>.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <div class="kicker">실제 MD 3</div>
+          <h2>DESIGN.md는 AI에게 “우리 취향”을 알려준다</h2>
+          <div class="mac-window">
+            <div class="mac-bar">
+              <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+              <div class="path">claude-budget-app / DESIGN.md excerpt</div>
+            </div>
+            <div class="markdown-view">
+              <div class="md-sidebar">
+                <div class="md-file">AGENTS.md</div>
+                <div class="md-file">CLAUDE.md</div>
+                <div class="md-file active">DESIGN.md</div>
+                <div class="md-file">DECISIONS.md</div>
+                <div class="md-file">CHECKS.md</div>
+              </div>
+              <div class="md-body">
+                <h3>Design System - weeple v2</h3>
+                <p><strong>Living spec:</strong> <code>mockup/c1-feature-map.html</code> is the visual ground truth.</p>
+                <p><strong>Anti-Slop:</strong></p>
+                <ul>
+                  <li>No generic SaaS card grid or decorative hero illustration</li>
+                  <li>No random purple/blue gradients as default palette</li>
+                  <li>No new colors outside the design tokens</li>
+                  <li>Verify visual work with screenshots, not vibes</li>
+                </ul>
+                <pre>accent:    '#0EA5A0'
+coral:     '#FF6F61'
+glassBg:   'rgba(255,255,255,0.18)'
+font:      Pretendard + Geist Mono</pre>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <div class="kicker">분리 원칙</div>
+          <h2>진짜 프로젝트 사실은 전용 문서에 둔다</h2>
+          <div class="three">
+            <div class="doc-card">
+              <span class="tag">상태</span>
+              <h3>PROJECT_STATE</h3>
+              <p>현재 어디까지 했고, 다음에 무엇을 해야 하는지</p>
+            </div>
+            <div class="doc-card">
+              <span class="tag">검증</span>
+              <h3>CHECKS</h3>
+              <p>작업이 끝났다고 말하려면 무엇을 돌려야 하는지</p>
+            </div>
+            <div class="doc-card">
+              <span class="tag">결정</span>
+              <h3>DECISIONS</h3>
+              <p>되돌리면 안 되는 선택과 그 이유</p>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <div class="kicker">용어 정리</div>
+          <h2>비개발자에게는 이 정도로 번역하면 된다</h2>
+          <div class="glossary">
+            <div class="term">
+              <h3>Issue</h3>
+              <p>AI와 사람이 같이 보는 작업 카드</p>
+            </div>
+            <div class="term">
+              <h3>Branch</h3>
+              <p>원본을 망치지 않고 실험하는 별도 작업선</p>
+            </div>
+            <div class="term">
+              <h3>Pull Request</h3>
+              <p>변경 내용을 합치기 전에 검수하는 공간</p>
+            </div>
+            <div class="term">
+              <h3>Checks</h3>
+              <p>작업이 진짜 끝났는지 확인하는 증거</p>
+            </div>
+            <div class="term">
+              <h3>Harness</h3>
+              <p>AI가 길을 잃지 않게 잡아주는 작업 안전장치</p>
+            </div>
+            <div class="term">
+              <h3>Context</h3>
+              <p>AI가 판단하기 전에 읽어야 하는 프로젝트 맥락</p>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <div class="shot-layout">
+            <div class="shot-copy">
+              <div class="kicker">운영 화면 1</div>
+              <h2>Issue는 AI에게 주는 작업 카드다</h2>
+              <p class="lead">
+                다음 할 일을 GitHub Issue에 고정하면, AI도 사람도 같은 우선순위를 본다.
+              </p>
+            </div>
+            <div class="screenshot">
+              <img src="lecture_assets/github_issue_weeple_seo.png" alt="GitHub Issue 화면 캡처" />
+              <div class="caption-chip">GitHub Issue: 다음 작업 트래커</div>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <div class="shot-layout">
+            <div class="shot-copy">
+              <div class="kicker">운영 화면 2</div>
+              <h2>PR은 AI 작업의 검수 공간이다</h2>
+              <p class="lead">
+                변경 이유, 테스트 계획, 리뷰 상태를 한 화면에 남기면 “왜 이렇게 됐지?”를 줄일 수 있다.
+              </p>
+            </div>
+            <div class="screenshot">
+              <img src="lecture_assets/github_pr_weeple_master.png" alt="GitHub Pull Request 화면 캡처" />
+              <div class="caption-chip">GitHub Pull Request: 변경 검수</div>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <div class="kicker">실습</div>
+          <h2>내 프로젝트에 AI 온보딩 문서 만들기</h2>
+          <div class="split">
+            <div class="tile">
+              <h3>1단계: 얇은 입구</h3>
+              <p>AGENTS.md에 “무엇을 먼저 읽을지”만 적는다.</p>
+            </div>
+            <div class="tile">
+              <h3>2단계: 사실 분리</h3>
+              <p>상태, 검증, 결정, 디자인 기준을 각각 전용 문서로 나눈다.</p>
+            </div>
+          </div>
+          <div class="quote">
+            <p>AI에게는 긴 설명보다 <strong>읽을 순서</strong>가 더 중요하다.</p>
+          </div>
+        </section>
+
+        <section>
+          <div class="kicker">실습 산출물</div>
+          <h2>오늘 끝나고 남아야 하는 것</h2>
+          <div class="checklist">
+            <div class="check">
+              <div class="box">1</div>
+              <div>
+                <h3>AGENTS.md</h3>
+                <p>AI가 제일 먼저 읽을 공통 목차</p>
+              </div>
+            </div>
+            <div class="check">
+              <div class="box">2</div>
+              <div>
+                <h3>PROJECT_STATE.md</h3>
+                <p>현재 상태, 다음 작업, 막힌 점</p>
+              </div>
+            </div>
+            <div class="check">
+              <div class="box">3</div>
+              <div>
+                <h3>CHECKS.md</h3>
+                <p>완료를 증명하는 명령어와 수동 확인</p>
+              </div>
+            </div>
+            <div class="check">
+              <div class="box">4</div>
+              <div>
+                <h3>DECISIONS.md</h3>
+                <p>되돌리면 안 되는 결정과 이유</p>
+              </div>
+            </div>
+            <div class="check">
+              <div class="box">5</div>
+              <div>
+                <h3>DESIGN.md</h3>
+                <p>제품 톤, 금지 패턴, 시각 검증 기준</p>
+              </div>
+            </div>
+            <div class="check">
+              <div class="box">6</div>
+              <div>
+                <h3>GitHub Issue</h3>
+                <p>AI에게 맡길 다음 작업 카드 하나</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <div class="kicker">워크시트</div>
+          <h2>수강생이 직접 채울 한 장</h2>
+          <div class="worksheet">
+            <div class="field">
+              <h3>지금 프로젝트 상태</h3>
+              <div class="line"></div>
+              <div class="line"></div>
+            </div>
+            <div class="field">
+              <h3>다음에 맡길 작업</h3>
+              <div class="line"></div>
+              <div class="line"></div>
+            </div>
+            <div class="field">
+              <h3>완료 확인 방법</h3>
+              <div class="line"></div>
+              <div class="line"></div>
+            </div>
+            <div class="field">
+              <h3>AI가 하지 말아야 할 것</h3>
+              <div class="line"></div>
+              <div class="line"></div>
+            </div>
+            <div class="field wide">
+              <h3>첫 GitHub Issue 제목</h3>
+              <div class="line"></div>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <div class="kicker">복붙 프롬프트 1</div>
+          <h2>처음 만들 때 쓰는 프롬프트</h2>
+          <div class="code-prompt compact">내 프로젝트를 AI와 함께 안정적으로 작업할 수 있게
+하네스 문서를 만들어줘.
+
+먼저 README, package.json, 기존 AGENTS.md / CLAUDE.md /
+DESIGN.md가 있으면 읽어줘.
+
+만들 문서:
+- AGENTS.md: 얇은 공통 출입문
+- CLAUDE.md: Claude 전용 어댑터
+- PROJECT_STATE.md / CHECKS.md / DECISIONS.md
+- DESIGN.md: 제품 톤과 금지 패턴
+
+AGENTS.md에 모든 내용을 몰아넣지 말고,
+전용 문서로 분리해줘.
+마지막에 GitHub Issue 작업 카드 3개도 제안해줘.</div>
+        </section>
+
+        <section>
+          <div class="kicker">복붙 프롬프트 2</div>
+          <h2>이미 문서가 있을 때는 이렇게 보완한다</h2>
+          <div class="code-prompt compact">현재 AGENTS.md / CLAUDE.md / DESIGN.md /
+PROJECT_STATE.md / CHECKS.md / DECISIONS.md를 읽고
+서로 충돌하거나 중복되는 내용을 찾아줘.
+
+원칙:
+- AGENTS.md는 얇은 공통 출입문으로 유지
+- CLAUDE.md는 AGENTS.md를 따르는 어댑터로 유지
+- 실제 프로젝트 사실은 전용 문서로 이동
+- DESIGN.md에는 화면 톤, 금지 패턴, 검증 기준만 남김
+
+수정 전에는 어떤 문제가 있는지 요약하고,
+수정 후에는 변경 파일과 남은 리스크를 알려줘.</div>
+        </section>
+
+        <section>
+          <div class="kicker">지시문</div>
+          <h2>AI에게 이렇게 시킨다</h2>
+          <div class="quote">
+            <p>
+              하네스 문서를 먼저 읽고 작업해줘.<br />
+              필요한 변경만 하고,<br />
+              <strong>확인 결과까지</strong> 알려줘.
+            </p>
+          </div>
+        </section>
+
+        <section>
+          <div class="hero">
+            <div>
+              <div class="kicker">마무리</div>
+              <h2>AI를 바꾸기 전에, AI가 읽는 입구를 정리하자</h2>
+              <p class="lead">
+                좋은 결과는 더 긴 프롬프트보다, 더 좋은 작업 시스템에서 나온다.
+              </p>
+            </div>
+            <div class="hero-mark" aria-hidden="true">
+              <div class="orbit"></div>
+              <div class="mini-card a">State<small>지금 어디인가</small></div>
+              <div class="mini-card b">Checks<small>끝났는가</small></div>
+              <div class="mini-card c">Decisions<small>왜 이렇게 했나</small></div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <div class="clawd-layer" aria-hidden="true">
+      <div class="clawd-bubble">하네스 먼저 읽기</div>
+      <div class="clawd" title="Clawd">
+        <div class="clawd-status">idle</div>
+        <img class="clawd-sprite" src="lecture_assets/clawd/clawd-idle.gif" alt="" />
+        <div class="clawd-shadow"></div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.2.1/dist/reveal.js"></script>
+    <script>
+      Reveal.initialize({
+        hash: true,
+        controls: true,
+        progress: true,
+        center: false,
+        transition: "fade",
+        backgroundTransition: "fade",
+        width: 1280,
+        height: 720,
+        margin: 0,
+        minScale: 0.2,
+        maxScale: 1.5
+      });
+
+      const clawdLayer = document.querySelector(".clawd-layer");
+      const clawd = document.querySelector(".clawd");
+      const clawdSprite = document.querySelector(".clawd-sprite");
+      const bubble = document.querySelector(".clawd-bubble");
+      const statusBadge = document.querySelector(".clawd-status");
+      const clawdLines = [
+        "하네스 먼저 읽기",
+        "Issue는 작업 카드",
+        "PR에서 검수",
+        "CHECKS 돌렸어?",
+        "DESIGN.md 확인"
+      ];
+      const clawdStates = [
+        { state: "idle", label: "idle", line: "강의 시작", sprite: "clawd-idle.gif" },
+        { state: "thinking", label: "plan", line: "오늘 흐름 보기", sprite: "clawd-thinking.gif" },
+        { state: "thinking", label: "think", line: "문제 정리 중", sprite: "clawd-thinking.gif" },
+        { state: "thinking", label: "tools", line: "입구 비교", sprite: "clawd-thinking.gif" },
+        { state: "thinking", label: "oss", line: "오픈소스 보기", sprite: "clawd-thinking.gif" },
+        { state: "thinking", label: "mcp", line: "Skill/MCP 구분", sprite: "clawd-thinking.gif" },
+        { state: "working", label: "omx", line: "런타임 하네스", sprite: "clawd-typing.gif" },
+        { state: "thinking", label: "map", line: "MD와 런타임 구분", sprite: "clawd-thinking.gif" },
+        { state: "thinking", label: "map", line: "문서 구조 보기", sprite: "clawd-thinking.gif" },
+        { state: "working", label: "md", line: "AGENTS 읽는 중", sprite: "clawd-typing.gif" },
+        { state: "working", label: "md", line: "CLAUDE 연결 중", sprite: "clawd-typing.gif" },
+        { state: "working", label: "design", line: "DESIGN 확인", sprite: "clawd-typing.gif" },
+        { state: "thinking", label: "docs", line: "사실 분리", sprite: "clawd-thinking.gif" },
+        { state: "thinking", label: "term", line: "용어 번역", sprite: "clawd-thinking.gif" },
+        { state: "working", label: "issue", line: "Issue 카드화", sprite: "clawd-typing.gif" },
+        { state: "working", label: "pr", line: "PR 검수", sprite: "clawd-typing.gif" },
+        { state: "working", label: "make", line: "직접 만들기", sprite: "clawd-typing.gif" },
+        { state: "happy", label: "done", line: "산출물 체크", sprite: "clawd-happy.gif" },
+        { state: "happy", label: "sheet", line: "워크시트 완성", sprite: "clawd-happy.gif" },
+        { state: "working", label: "prompt", line: "프롬프트 작성", sprite: "clawd-typing.gif" },
+        { state: "working", label: "fix", line: "문서 보완", sprite: "clawd-typing.gif" },
+        { state: "happy", label: "ask", line: "이렇게 시키기", sprite: "clawd-happy.gif" },
+        { state: "sleeping", label: "sleep", line: "입구 정리 완료", sprite: "clawd-sleeping.gif" }
+      ];
+
+      function setClawdState(index) {
+        const config = clawdStates[index] || clawdStates[index % clawdStates.length];
+        clawdLayer.dataset.state = config.state;
+        statusBadge.textContent = config.label;
+        clawdSprite.src = `lecture_assets/clawd/${config.sprite}`;
+        return config;
+      }
+
+      function clawdSay(index, customLine) {
+        const config = setClawdState(index);
+        bubble.textContent = customLine || config.line || clawdLines[index % clawdLines.length];
+        clawdLayer.classList.add("talking", "hop");
+        window.setTimeout(() => clawdLayer.classList.remove("hop"), 380);
+        window.clearTimeout(clawdLayer.hideTimer);
+        clawdLayer.hideTimer = window.setTimeout(() => {
+          clawdLayer.classList.remove("talking");
+        }, 1600);
+      }
+
+      window.addEventListener("pointermove", (event) => {
+        const x = Math.max(-14, Math.min(10, (event.clientX - window.innerWidth / 2) / 90));
+        const y = Math.max(-10, Math.min(10, (event.clientY - window.innerHeight / 2) / 110));
+        clawdLayer.style.setProperty("--clawd-x", `${x}px`);
+        clawdLayer.style.setProperty("--clawd-y", `${y}px`);
+      });
+
+      clawd.addEventListener("click", () => {
+        const index = Math.floor(Math.random() * clawdLines.length);
+        clawdSay(index, clawdLines[index]);
+      });
+
+      Reveal.on("slidechanged", (event) => {
+        setClawdState(event.indexh);
+        clawdLayer.classList.add("hop");
+        window.setTimeout(() => clawdLayer.classList.remove("hop"), 380);
+      });
+
+      setClawdState(Reveal.getIndices().h || 0);
+    </script>
+  </body>
+</html>

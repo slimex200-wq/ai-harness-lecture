@@ -1,0 +1,7 @@
+*
+!.gitignore
+!README.md
+!index.html
+!agents_claude_design_reveal.html
+!lecture_assets/
+!lecture_assets/**
