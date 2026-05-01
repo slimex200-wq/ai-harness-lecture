@@ -1416,18 +1416,36 @@ PROJECT_STATE.md / CHECKS.md / DECISIONS.md를 읽고
         { state: "idle", label: "ask", line: "이렇게 시키기", sprite: "clawd-idle-follow.svg" },
         { state: "idle", label: "sleep", line: "입구 정리 완료", sprite: "clawd-idle-follow.svg" }
       ];
+      const clawdClickStates = [
+        { state: "idle", label: "idle", sprite: "clawd-idle-follow.svg" },
+        { state: "working", label: "type", sprite: "clawd-working-typing.svg" },
+        { state: "working", label: "think", sprite: "clawd-working-thinking.svg" },
+        { state: "happy", label: "happy", sprite: "clawd-happy.svg" },
+        { state: "sleeping", label: "sleep", sprite: "clawd-sleeping.svg" }
+      ];
       const clawdStorageKey = "ai-harness-lecture-clawd-position";
       let clawdDrag = null;
       let clawdClickSuppressed = false;
+      let clawdClickStateIndex = 0;
 
-      function setClawdState(index) {
-        const config = clawdStates[index] || clawdStates[index % clawdStates.length];
+      function setClawdVisual(config) {
         clawdLayer.dataset.state = config.state;
         statusBadge.textContent = config.label;
         if (!clawdObject.data.endsWith(config.sprite)) {
           clawdObject.data = `lecture_assets/clawd/${config.sprite}`;
         }
+      }
+
+      function setClawdState(index) {
+        const config = clawdStates[index] || clawdStates[index % clawdStates.length];
+        clawdClickStateIndex = 0;
+        setClawdVisual(config);
         return config;
+      }
+
+      function cycleClawdMascot() {
+        clawdClickStateIndex = (clawdClickStateIndex + 1) % clawdClickStates.length;
+        setClawdVisual(clawdClickStates[clawdClickStateIndex]);
       }
 
       function applySvgEyeMove(dx, dy) {
@@ -1568,6 +1586,7 @@ PROJECT_STATE.md / CHECKS.md / DECISIONS.md를 읽고
         event.preventDefault();
         event.stopPropagation();
         if (!clawdClickSuppressed) {
+          cycleClawdMascot();
           clawdLayer.classList.add("hop");
           window.setTimeout(() => clawdLayer.classList.remove("hop"), 380);
         }
