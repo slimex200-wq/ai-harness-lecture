@@ -662,9 +662,11 @@
         display: grid;
         gap: 8px;
         justify-items: center;
-        pointer-events: none;
+        pointer-events: auto;
         transform: translate(var(--clawd-x, 0), var(--clawd-y, 0));
         transition: transform 220ms ease;
+        user-select: none;
+        touch-action: none;
       }
 
       .clawd-layer.dragging {
@@ -702,6 +704,8 @@
         image-rendering: pixelated;
         transform-origin: 50% 100%;
         animation: clawd-idle 2.8s steps(2, end) infinite;
+        user-select: none;
+        touch-action: none;
       }
 
       .clawd:active {
@@ -719,6 +723,9 @@
         filter: drop-shadow(0 12px 20px rgba(22, 21, 18, 0.16));
         transform: scale(1.55);
         transform-origin: 50% 100%;
+        pointer-events: none;
+        user-select: none;
+        -webkit-user-drag: none;
       }
 
       .clawd-shadow {
@@ -1339,7 +1346,7 @@ PROJECT_STATE.md / CHECKS.md / DECISIONS.md를 읽고
       <div class="clawd-bubble">하네스 먼저 읽기</div>
       <div class="clawd" title="Clawd">
         <div class="clawd-status">idle</div>
-        <img class="clawd-sprite" src="lecture_assets/clawd/clawd-idle.gif" alt="" />
+        <img class="clawd-sprite" src="lecture_assets/clawd/clawd-idle.gif" alt="" draggable="false" />
         <div class="clawd-shadow"></div>
       </div>
       <div class="clawd-help">드래그로 이동 · 더블클릭 반응 · 우클릭 리셋</div>
@@ -1475,6 +1482,8 @@ PROJECT_STATE.md / CHECKS.md / DECISIONS.md를 읽고
 
       clawd.addEventListener("pointerdown", (event) => {
         if (event.button !== 0) return;
+        event.preventDefault();
+        event.stopPropagation();
         const rect = clawdLayer.getBoundingClientRect();
         clawdDrag = {
           pointerId: event.pointerId,
@@ -1490,6 +1499,8 @@ PROJECT_STATE.md / CHECKS.md / DECISIONS.md를 읽고
 
       clawd.addEventListener("pointerup", (event) => {
         if (!clawdDrag) return;
+        event.preventDefault();
+        event.stopPropagation();
         const moved = Math.hypot(event.clientX - clawdDrag.startX, event.clientY - clawdDrag.startY);
         clawdClickSuppressed = moved > 6;
         clawdLayer.classList.remove("dragging");
@@ -1508,13 +1519,21 @@ PROJECT_STATE.md / CHECKS.md / DECISIONS.md를 읽고
         clawdDrag = null;
       });
 
-      clawd.addEventListener("click", () => {
+      clawd.addEventListener("dragstart", (event) => {
+        event.preventDefault();
+      });
+
+      clawd.addEventListener("click", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
         if (clawdClickSuppressed) return;
         const index = Math.floor(Math.random() * clawdLines.length);
         clawdSay(index, clawdLines[index]);
       });
 
-      clawd.addEventListener("dblclick", () => {
+      clawd.addEventListener("dblclick", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
         clawdSay(Reveal.getIndices().h || 0, "좋아, 계속 가자");
       });
 
