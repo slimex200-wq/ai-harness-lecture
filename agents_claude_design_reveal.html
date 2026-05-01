@@ -1465,23 +1465,9 @@ PROJECT_STATE.md / CHECKS.md / DECISIONS.md를 읽고
         clawdSay(Reveal.getIndices().h || 0, "위치 리셋");
       }
 
-      window.addEventListener("pointermove", (event) => {
-        if (clawdDrag) {
-          event.preventDefault();
-          const left = event.clientX - clawdDrag.offsetX;
-          const top = event.clientY - clawdDrag.offsetY;
-          setClawdPosition(left, top);
-          return;
-        }
-
-        const x = Math.max(-14, Math.min(10, (event.clientX - window.innerWidth / 2) / 90));
-        const y = Math.max(-10, Math.min(10, (event.clientY - window.innerHeight / 2) / 110));
-        clawdLayer.style.setProperty("--clawd-x", `${x}px`);
-        clawdLayer.style.setProperty("--clawd-y", `${y}px`);
-      });
-
-      clawd.addEventListener("pointerdown", (event) => {
+      function startClawdDrag(event) {
         if (event.button !== 0) return;
+        if (!event.target.closest(".clawd-layer")) return;
         event.preventDefault();
         event.stopPropagation();
         const rect = clawdLayer.getBoundingClientRect();
@@ -1494,17 +1480,33 @@ PROJECT_STATE.md / CHECKS.md / DECISIONS.md를 읽고
         };
         clawdClickSuppressed = false;
         clawdLayer.classList.add("dragging");
-        clawd.setPointerCapture(event.pointerId);
-      });
+        document.body.style.cursor = "grabbing";
+      }
 
-      clawd.addEventListener("pointerup", (event) => {
+      function moveClawdDrag(event) {
+        if (clawdDrag) {
+          event.preventDefault();
+          event.stopPropagation();
+          const left = event.clientX - clawdDrag.offsetX;
+          const top = event.clientY - clawdDrag.offsetY;
+          setClawdPosition(left, top);
+          return;
+        }
+
+        const x = Math.max(-14, Math.min(10, (event.clientX - window.innerWidth / 2) / 90));
+        const y = Math.max(-10, Math.min(10, (event.clientY - window.innerHeight / 2) / 110));
+        clawdLayer.style.setProperty("--clawd-x", `${x}px`);
+        clawdLayer.style.setProperty("--clawd-y", `${y}px`);
+      }
+
+      function endClawdDrag(event) {
         if (!clawdDrag) return;
         event.preventDefault();
         event.stopPropagation();
         const moved = Math.hypot(event.clientX - clawdDrag.startX, event.clientY - clawdDrag.startY);
         clawdClickSuppressed = moved > 6;
         clawdLayer.classList.remove("dragging");
-        clawd.releasePointerCapture(clawdDrag.pointerId);
+        document.body.style.cursor = "";
         clawdDrag = null;
         if (clawdClickSuppressed) {
           clawdSay(Reveal.getIndices().h || 0, "여기가 좋아");
@@ -1512,10 +1514,15 @@ PROJECT_STATE.md / CHECKS.md / DECISIONS.md를 읽고
             clawdClickSuppressed = false;
           }, 80);
         }
-      });
+      }
+
+      document.addEventListener("pointerdown", startClawdDrag, true);
+      document.addEventListener("pointermove", moveClawdDrag, true);
+      document.addEventListener("pointerup", endClawdDrag, true);
 
       clawd.addEventListener("pointercancel", () => {
         clawdLayer.classList.remove("dragging");
+        document.body.style.cursor = "";
         clawdDrag = null;
       });
 
